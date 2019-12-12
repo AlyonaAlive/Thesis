@@ -1,0 +1,30 @@
+function [output, px,py,nx,ny ] = compute_new_point( XA, YA, XB, YB, XC, YC, XD, YD, nax, nay, nbx, nby)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+%   1) Construct conic
+%   2) Compute intersection point 
+%   3) Compute new vector as a gradient at the point
+
+
+syms W0 W1 W2 W3 W4 W5 x y;
+W0=1^3; W1 = 1^3; W2 = 1^3; W3 = 1^3; W4 = 1^5; W5 = 1^5;
+
+conic_coeff= construct_conic_section_2(W0, W1, W2, W3, W4, W5, XA, YA, XB, YB, XC, YC, XD, YD, nax, nay, nbx, nby);
+
+new_point = intersection_point(W0, W1, W2, W3, W4, W5, XA, YA, XB, YB, XC, YC, XD, YD, nax, nay, nbx, nby, conic_coeff);
+px = new_point(1);
+py = new_point(2);
+
+%new normal nn as gradient at the point
+a=conic_coeff(1);b=conic_coeff(2);c=conic_coeff(3);d=conic_coeff(4);e=conic_coeff(5);f=conic_coeff(6);
+
+F(x,y) = a*x^2+b*x*y+c*y^2+d*x+e*y+f;
+grad_f=gradient(F);
+nn = double(feval(grad_f,px,py));
+nn = (norm([nax, nay])+norm([nbx, nby]))*nn/(2*norm(nn)); 
+nx = double(nn(1));
+ny = double(nn(2));
+
+output = [px py nx ny];
+end
+
